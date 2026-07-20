@@ -1,0 +1,10 @@
+{
+  "app": "realApp",
+  "optional_functions": 44,
+  "indispensable": 123,
+  "hybrid_groups": 5,
+  "original_ms": 0.4301,
+  "hybrid_ms": 0.0505,
+  "improvement_ms": 0.3796,
+  "improvement_pct": 88.3
+}

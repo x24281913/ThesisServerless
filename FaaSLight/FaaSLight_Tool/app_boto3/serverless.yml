@@ -1,0 +1,12 @@
+service: app-boto3
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: us-east-1
+  memorySize: 128
+  timeout: 120
+
+functions:
+  boto3Fun:
+    handler: main.lambda_handler

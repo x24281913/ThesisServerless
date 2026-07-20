@@ -1,0 +1,10 @@
+{
+  "app": "app_dateutil",
+  "optional_functions": 29,
+  "indispensable": 484,
+  "hybrid_groups": 4,
+  "original_ms": 0.4015,
+  "hybrid_ms": 0.071,
+  "improvement_ms": 0.3305,
+  "improvement_pct": 82.3
+}

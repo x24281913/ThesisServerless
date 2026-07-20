@@ -1,0 +1,10 @@
+{
+  "app": "app_requests",
+  "optional_functions": 129,
+  "indispensable": 885,
+  "hybrid_groups": 11,
+  "original_ms": 2.025,
+  "hybrid_ms": 0.0845,
+  "improvement_ms": 1.9405,
+  "improvement_pct": 95.8
+}

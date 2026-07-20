@@ -1,0 +1,7 @@
+
+charset_normalizer
+lxml
+lxml.html
+requests
+urllib3
+urllib3.contrib

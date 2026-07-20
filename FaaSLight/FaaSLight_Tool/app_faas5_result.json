@@ -1,0 +1,10 @@
+{
+  "app": "app_faas5",
+  "optional_functions": 288,
+  "indispensable": 740,
+  "hybrid_groups": 26,
+  "original_ms": 2.1267,
+  "hybrid_ms": 0.1082,
+  "improvement_ms": 2.0185,
+  "improvement_pct": 94.9
+}

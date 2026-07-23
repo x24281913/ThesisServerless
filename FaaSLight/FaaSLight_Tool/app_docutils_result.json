@@ -1,0 +1,10 @@
+{
+  "app": "app_docutils",
+  "optional_functions": 139,
+  "indispensable": 567,
+  "hybrid_groups": 14,
+  "original_ms": 1.0897,
+  "hybrid_ms": 0.1092,
+  "improvement_ms": 0.9805,
+  "improvement_pct": 90.0
+}

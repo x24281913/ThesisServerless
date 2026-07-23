@@ -1,0 +1,8 @@
+
+jedi
+jedi.api
+jedi.inference
+jedi.plugins
+parso
+parso.pgen2
+parso.python

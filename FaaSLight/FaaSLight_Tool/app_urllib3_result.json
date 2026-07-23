@@ -1,0 +1,10 @@
+{
+  "app": "app_urllib3",
+  "optional_functions": 66,
+  "indispensable": 348,
+  "hybrid_groups": 6,
+  "original_ms": 0.6186,
+  "hybrid_ms": 0.0915,
+  "improvement_ms": 0.5271,
+  "improvement_pct": 85.2
+}

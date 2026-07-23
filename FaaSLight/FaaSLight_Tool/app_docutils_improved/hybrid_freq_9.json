@@ -1,0 +1,1 @@
+{"docutils.nodes.create_keyword_validator.validate_keywords": "\ndef validate_keywords(value: str) -> str:\n    if value not in keywords:\n        allowed = '\", \"'.join(keywords)\n        raise ValueError(f'\"{value}\" is not one of \"{allowed}\".')\n    return value"}

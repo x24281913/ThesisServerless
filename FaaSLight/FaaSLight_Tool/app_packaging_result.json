@@ -1,0 +1,10 @@
+{
+  "app": "app_packaging",
+  "optional_functions": 76,
+  "indispensable": 350,
+  "hybrid_groups": 8,
+  "original_ms": 0.6256,
+  "hybrid_ms": 0.166,
+  "improvement_ms": 0.4596,
+  "improvement_pct": 73.5
+}

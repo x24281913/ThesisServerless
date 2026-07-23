@@ -1,0 +1,8 @@
+{
+  "_distutils_hack.__init__.warn_distutils_present": "hybrid_freq_0",
+  "_distutils_hack.__init__.ensure_local_distutils": "hybrid_freq_0",
+  "_distutils_hack.__init__._remove_shim": "hybrid_freq_0",
+  "_distutils_hack.__init__.clear_distutils": "hybrid_freq_0",
+  "_distutils_hack.__init__.enabled": "hybrid_freq_0",
+  "_distutils_hack.__init__.do_override": "hybrid_freq_0"
+}

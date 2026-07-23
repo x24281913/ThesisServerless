@@ -1,0 +1,12 @@
+"""
+Hebrew-language mappings for language-dependent features of Docutils.
+"""
+
+__docformat__ = 'reStructuredText'
+labels = {'author': 'מחבר', 'authors': 'מחברי', 'organization': 'ארגון', 'address': 'כתובת', 'contact': 'איש קשר', 'version': 'גרסה', 'revision': 'מהדורה', 'status': 'סטטוס', 'date': 'תאריך', 'copyright': 'זכויות שמורות', 'dedication': 'הקדשה', 'abstract': 'תקציר', 'attention': 'תשומת לב', 'caution': 'זהירות', 'danger': 'סכנה', 'error': 'שגיאה', 'hint': 'רמז', 'important': 'חשוב', 'note': 'הערה', 'tip': 'טיפ', 'warning': 'אזהרה', 'contents': 'תוכן'}
+'Mapping of node class name to label text.'
+bibliographic_fields = {'מחבר': 'author', 'מחברי': 'authors', 'ארגון': 'organization', 'כתובת': 'address', 'איש קשר': 'contact', 'גרסה': 'version', 'מהדורה': 'revision', 'סטטוס': 'status', 'תאריך': 'date', 'זכויות שמורות': 'copyright', 'הקדשה': 'dedication', 'תקציר': 'abstract'}
+'Hebrew to canonical name mapping for bibliographic fields.'
+author_separators = [';', ',']
+"List of separator strings for the 'Authors' bibliographic field. Tried in\norder."
+

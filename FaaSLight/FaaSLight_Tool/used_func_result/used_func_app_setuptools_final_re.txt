@@ -1,0 +1,4 @@
+custom_funtemplate.rewrite_template
+main
+main.lambda_handler
+setuptools.dist.Distribution

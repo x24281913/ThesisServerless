@@ -1,0 +1,12 @@
+"""
+Catalan-language mappings for language-dependent features of Docutils.
+"""
+
+__docformat__ = 'reStructuredText'
+labels = {'author': 'Autor', 'authors': 'Autors', 'organization': 'Organització', 'address': 'Adreça', 'contact': 'Contacte', 'version': 'Versió', 'revision': 'Revisió', 'status': 'Estat', 'date': 'Data', 'copyright': 'Copyright', 'dedication': 'Dedicatòria', 'abstract': 'Resum', 'attention': 'Atenció!', 'caution': 'Compte!', 'danger': 'PERILL!', 'error': 'Error', 'hint': 'Suggeriment', 'important': 'Important', 'note': 'Nota', 'tip': 'Consell', 'warning': 'Avís', 'contents': 'Contingut'}
+'Mapping of node class name to label text.'
+bibliographic_fields = {'autor': 'author', 'autors': 'authors', 'organització': 'organization', 'adreça': 'address', 'contacte': 'contact', 'versió': 'version', 'revisió': 'revision', 'estat': 'status', 'data': 'date', 'copyright': 'copyright', 'dedicatòria': 'dedication', 'resum': 'abstract'}
+'Catalan (lowcased) to canonical name mapping for bibliographic fields.'
+author_separators = [';', ',']
+"List of separator strings for the 'Authors' bibliographic field. Tried in\norder."
+

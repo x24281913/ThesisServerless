@@ -1,0 +1,10 @@
+{
+  "app": "app_setuptools",
+  "optional_functions": 6,
+  "indispensable": 3,
+  "hybrid_groups": 1,
+  "original_ms": 0.0673,
+  "hybrid_ms": 0.0401,
+  "improvement_ms": 0.0272,
+  "improvement_pct": 40.4
+}

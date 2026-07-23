@@ -1,0 +1,10 @@
+{
+  "app": "app_jedi",
+  "optional_functions": 235,
+  "indispensable": 2510,
+  "hybrid_groups": 20,
+  "original_ms": 1.7316,
+  "hybrid_ms": 0.0713,
+  "improvement_ms": 1.6603,
+  "improvement_pct": 95.9
+}

@@ -1,0 +1,145 @@
+import os
+import sys
+report_url = 'https://github.com/pypa/setuptools/issues/new?template=distutils-deprecation.yml'
+
+def warn_distutils_present():
+    import custom_funtemplate
+    return custom_funtemplate.rewrite_template('_distutils_hack.__init__.warn_distutils_present', 'warn_distutils_present()', {'sys': sys}, 1)
+
+def clear_distutils():
+    import custom_funtemplate
+    return custom_funtemplate.rewrite_template('_distutils_hack.__init__.clear_distutils', 'clear_distutils()', {'sys': sys, 'report_url': report_url}, 1)
+
+def enabled():
+    """
+    Allow selection of distutils by environment variable.
+    """
+    import custom_funtemplate
+    return custom_funtemplate.rewrite_template('_distutils_hack.__init__.enabled', 'enabled()', {'os': os, 'report_url': report_url}, 1)
+
+def ensure_local_distutils():
+    import custom_funtemplate
+    custom_funtemplate.rewrite_template('_distutils_hack.__init__.ensure_local_distutils', 'ensure_local_distutils()', {'clear_distutils': clear_distutils, 'shim': shim, 'sys': sys}, 0)
+
+def do_override():
+    """
+    Ensure that the local copy of distutils is preferred over stdlib.
+
+    See https://github.com/pypa/setuptools/issues/417#issuecomment-392298401
+    for more motivation.
+    """
+    import custom_funtemplate
+    custom_funtemplate.rewrite_template('_distutils_hack.__init__.do_override', 'do_override()', {'enabled': enabled, 'warn_distutils_present': warn_distutils_present, 'ensure_local_distutils': ensure_local_distutils}, 0)
+
+
+class _TrivialRe:
+    
+    def __init__(self, *patterns) -> None:
+        self._patterns = patterns
+    
+    def match(self, string):
+        return all((pat in string for pat in self._patterns))
+
+
+
+class DistutilsMetaFinder:
+    
+    def find_spec(self, fullname, path, target=None):
+        if (path is not None and not fullname.startswith('test.')):
+            return None
+        method_name = 'spec_for_{fullname}'.format(**locals())
+        method = getattr(self, method_name, lambda: None)
+        return method()
+    
+    def spec_for_distutils(self):
+        if self.is_cpython():
+            return None
+        import importlib
+        import importlib.abc
+        import importlib.util
+        try:
+            mod = importlib.import_module('setuptools._distutils')
+        except Exception:
+            return None
+        
+        
+        class DistutilsLoader(importlib.abc.Loader):
+            
+            def create_module(self, spec):
+                mod.__name__ = 'distutils'
+                return mod
+            
+            def exec_module(self, module):
+                pass
+        
+        return importlib.util.spec_from_loader('distutils', DistutilsLoader(), origin=mod.__file__)
+    
+    @staticmethod
+    def is_cpython():
+        """
+        Suppress supplying distutils for CPython (build and tests).
+        Ref #2965 and #3007.
+        """
+        return os.path.isfile('pybuilddir.txt')
+    
+    def spec_for_pip(self):
+        """
+        Ensure stdlib distutils when running under pip.
+        See pypa/pip#8761 for rationale.
+        """
+        if (sys.version_info >= (3, 12) or self.pip_imported_during_build()):
+            return
+        clear_distutils()
+        self.spec_for_distutils = lambda: None
+    
+    @classmethod
+    def pip_imported_during_build(cls):
+        """
+        Detect if pip is being imported in a build script. Ref #2355.
+        """
+        import traceback
+        return any((cls.frame_file_is_setup(frame) for (frame, line) in traceback.walk_stack(None)))
+    
+    @staticmethod
+    def frame_file_is_setup(frame):
+        """
+        Return True if the indicated frame suggests a setup.py file.
+        """
+        return frame.f_globals.get('__file__', '').endswith('setup.py')
+    
+    def spec_for_sensitive_tests(self):
+        """
+        Ensure stdlib distutils when running select tests under CPython.
+
+        python/cpython#91169
+        """
+        clear_distutils()
+        self.spec_for_distutils = lambda: None
+    sensitive_tests = (['test.test_distutils', 'test.test_peg_generator', 'test.test_importlib'] if sys.version_info < (3, 10) else ['test.test_distutils'])
+
+for name in DistutilsMetaFinder.sensitive_tests:
+    setattr(DistutilsMetaFinder, f'spec_for_{name}', DistutilsMetaFinder.spec_for_sensitive_tests)
+DISTUTILS_FINDER = DistutilsMetaFinder()
+
+def add_shim():
+    (DISTUTILS_FINDER in sys.meta_path or insert_shim())
+
+
+class shim:
+    
+    def __enter__(self) -> None:
+        insert_shim()
+    
+    def __exit__(self, exc: object, value: object, tb: object) -> None:
+        _remove_shim()
+
+
+def insert_shim():
+    sys.meta_path.insert(0, DISTUTILS_FINDER)
+
+def _remove_shim():
+    import custom_funtemplate
+    custom_funtemplate.rewrite_template('_distutils_hack.__init__._remove_shim', '_remove_shim()', {'sys': sys, 'DISTUTILS_FINDER': DISTUTILS_FINDER}, 0)
+if sys.version_info < (3, 12):
+    remove_shim = _remove_shim
+

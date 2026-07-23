@@ -1,0 +1,10 @@
+{
+  "app": "app_parso",
+  "optional_functions": 57,
+  "indispensable": 187,
+  "hybrid_groups": 5,
+  "original_ms": 0.5097,
+  "hybrid_ms": 0.1067,
+  "improvement_ms": 0.403,
+  "improvement_pct": 79.1
+}

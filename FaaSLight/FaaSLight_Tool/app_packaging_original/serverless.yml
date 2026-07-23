@@ -1,0 +1,10 @@
+service: app-packaging
+provider:
+  name: aws
+  runtime: python3.9
+  region: us-east-1
+  memorySize: 128
+  timeout: 120
+functions:
+  packagingFun:
+    handler: main.lambda_handler

@@ -1,0 +1,36 @@
+"""
+This module is here to ensure compatibility of Windows/Linux/MacOS and
+different Python versions.
+"""
+
+import errno
+import sys
+import pickle
+from typing import Any
+
+
+class Unpickler(pickle.Unpickler):
+    
+    def find_class(self, module: str, name: str) -> Any:
+        if module == 'pathlib._local':
+            module = 'pathlib'
+        return super().find_class(module, name)
+
+
+def pickle_load(file):
+    try:
+        return Unpickler(file).load()
+    except OSError:
+        if sys.platform == 'win32':
+            raise EOFError()
+        raise
+
+def pickle_dump(data, file, protocol):
+    try:
+        pickle.dump(data, file, protocol)
+        file.flush()
+    except OSError:
+        if sys.platform == 'win32':
+            raise IOError(errno.EPIPE, 'Broken pipe')
+        raise
+

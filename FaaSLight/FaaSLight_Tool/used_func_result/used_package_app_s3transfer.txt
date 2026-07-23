@@ -1,0 +1,4 @@
+
+botocore
+botocore.vendored
+s3transfer

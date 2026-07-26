@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FaaSLight Gap 2 — Thesis Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: Arial, sans-serif; background: #F8F9FA; color: #222; padding: 24px; }
+h1 { font-size: 22px; font-weight: 600; color: #1F4E79; margin-bottom: 4px; }
+.subtitle { font-size: 13px; color: #888; margin-bottom: 24px; }
+.section-title { font-size: 13px; font-weight: 700; color: #444; text-transform: uppercase; letter-spacing: 0.05em; margin: 24px 0 12px; }
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+.card { background: white; border-radius: 10px; padding: 20px; border: 1px solid #E0E0E0; }
+.card-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.card-value { font-size: 28px; font-weight: 700; color: #1F4E79; }
+.card-delta { font-size: 12px; color: #2E7D32; margin-top: 4px; }
+.chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.chart-box { background: white; border-radius: 10px; padding: 20px; border: 1px solid #E0E0E0; }
+.chart-title { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 16px; }
+.table-box { background: white; border-radius: 10px; padding: 20px; border: 1px solid #E0E0E0; margin-bottom: 24px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 10px 14px; background: #1F4E79; color: white; font-weight: 500; font-size: 12px; }
+td { padding: 10px 14px; border-bottom: 1px solid #F0F0F0; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #F8F9FA; }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.badge-green { background: #E8F5E9; color: #2E7D32; }
+.badge-gray { background: #F5F5F5; color: #757575; }
+.badge-red { background: #FFEBEE; color: #C62828; }
+.divider { border: none; border-top: 1px solid #E0E0E0; margin: 24px 0; }
+.footer { text-align: center; font-size: 12px; color: #888; margin-top: 24px; padding-top: 16px; border-top: 1px solid #E0E0E0; }
+.loading { text-align: center; padding: 80px; font-size: 16px; color: #888; }
+.caption { font-size: 11px; color: #aaa; margin-top: 8px; }
+.note { font-size: 13px; color: #555; margin-bottom: 16px; padding: 12px; background: #EBF3FB; border-radius: 6px; border-left: 4px solid #1F4E79; }
+</style>
+</head>
+<body>
+
+<h1>FaaSLight — Improvement to Optional Functions</h1>
+<p class="subtitle">Amruta Anil Dicholkar | X24281913 | MSc Cloud Computing | NCI | Supervisor: Dr. Mosab Hamdan Mohamed</p>
+
+<div id="loading" class="loading">Loading results from API...</div>
+<div id="content" style="display:none">
+
+  <!-- Summary -->
+  <div class="section-title">Summary</div>
+  <div class="cards">
+    <div class="card">
+      <div class="card-label">Applications Tested</div>
+      <div class="card-value" id="total-apps">-</div>
+      <div class="card-delta" id="apps-sub">-</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Total Optional Functions</div>
+      <div class="card-value" id="total-optional">-</div>
+      <div class="card-delta">across all valid apps</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Best Improvement</div>
+      <div class="card-value" id="best-improvement">-</div>
+      <div class="card-delta" id="best-app">-</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Average Improvement</div>
+      <div class="card-value" id="avg-improvement">-</div>
+      <div class="card-delta">across valid apps</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Loading Time Charts -->
+  <div class="section-title">Loading Time Comparison</div>
+  <div class="note">Measures time to load optional functions from storage. Original FaaSLight loads ALL functions from one gzip file. Hybrid improvement loads only the needed group.</div>
+  <div class="chart-row">
+    <div class="chart-box">
+      <div class="chart-title">Original vs Hybrid Loading Time (ms)</div>
+      <div style="position:relative;height:300px;">
+        <canvas id="chart1" role="img" aria-label="Loading time comparison"></canvas>
+      </div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Percentage Improvement per Application</div>
+      <div style="position:relative;height:300px;">
+        <canvas id="chart2" role="img" aria-label="Improvement percentage"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Loading Time Results Table -->
+  <div class="section-title">Detailed Loading Time Results</div>
+  <div class="table-box">
+    <table>
+      <thead>
+        <tr>
+          <th>Application</th>
+          <th>Library</th>
+          <th>Optional Functions</th>
+          <th>Used Functions</th>
+          <th>Hybrid Groups</th>
+          <th>Original (ms)</th>
+          <th>Hybrid (ms)</th>
+          <th>Improvement</th>
+        </tr>
+      </thead>
+      <tbody id="results-table"></tbody>
+    </table>
+    <p class="caption" id="caption"></p>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Lambda Cold Start Section -->
+  <div class="section-title">AWS Lambda Cold Start Results</div>
+  <div class="note">Real end-to-end cold start latency measured on AWS Lambda. Includes container startup + code loading + execution phases. Smaller improvement expected as loading is only one phase of total cold start.</div>
+  <div class="chart-row">
+    <div class="chart-box">
+      <div class="chart-title">Original vs Hybrid Cold Start Time (ms)</div>
+      <div style="position:relative;height:300px;">
+        <canvas id="chart3" role="img" aria-label="Cold start comparison"></canvas>
+      </div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Cold Start Improvement per Application (%)</div>
+      <div style="position:relative;height:300px;">
+        <canvas id="chart4" role="img" aria-label="Cold start improvement"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="table-box">
+    <table>
+      <thead>
+        <tr>
+          <th>Application</th>
+          <th>Original Cold Start (ms)</th>
+          <th>Improved Cold Start (ms)</th>
+          <th>Difference (ms)</th>
+          <th>Improvement</th>
+        </tr>
+      </thead>
+      <tbody id="coldstart-table"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<div class="footer">
+  Foundation Paper: Liu, X. et al. (2023) FaaSLight — ACM TOSEM, Vol. 32, No. 5. doi: 10.1145/3585007
+</div>
+
+<script>
+const API_URL = 'https://fupc3z8wug.execute-api.us-east-1.amazonaws.com/prod/results';
+const COLDSTART_URL = 'https://fupc3z8wug.execute-api.us-east-1.amazonaws.com/prod/coldstart';
+
+async function loadData() {
+  try {
+    // Load loading time results
+    const response = await fetch(API_URL);
+    const data = await response.json();
+
+    const allValid = data.filter(d => d.optional_functions > 0);
+    const withImprovement = data.filter(d =>
+      d.optional_functions > 0 && d.improvement_pct > 0);
+
+    // KPI Cards
+    document.getElementById('total-apps').textContent = allValid.length;
+    document.getElementById('apps-sub').textContent =
+      data.length + ' total including no-optional apps';
+    document.getElementById('total-optional').textContent =
+      allValid.reduce((s, d) => s + d.optional_functions, 0);
+
+    const best = withImprovement.reduce((a, b) =>
+      a.improvement_pct > b.improvement_pct ? a : b);
+    document.getElementById('best-improvement').textContent =
+      best.improvement_pct.toFixed(1) + '%';
+    document.getElementById('best-app').textContent = best.app;
+
+    const avg = withImprovement.reduce((s, d) =>
+      s + d.improvement_pct, 0) / withImprovement.length;
+    document.getElementById('avg-improvement').textContent =
+      avg.toFixed(1) + '%';
+
+    const labels = allValid.map(d =>
+      d.app === 'realApp' ? 'arrow' : d.app.replace('app_', ''));
+    const orig = allValid.map(d => d.original_ms);
+    const hyb = allValid.map(d => d.hybrid_ms);
+    const impr = allValid.map(d => d.improvement_pct);
+
+    // Chart 1 - Loading time
+    new Chart(document.getElementById('chart1'), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          { label: 'Original FaaSLight', data: orig,
+            backgroundColor: '#5DADE2', borderRadius: 3 },
+          { label: 'Hybrid Improvement', data: hyb,
+            backgroundColor: '#1F4E79', borderRadius: 3 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } },
+        scales: {
+          x: { ticks: { maxRotation: 45, font: { size: 10 } } },
+          y: { title: { display: true, text: 'Time (ms)' },
+               grid: { color: '#F0F0F0' } }
+        }
+      }
+    });
+
+    // Chart 2 - Improvement %
+    new Chart(document.getElementById('chart2'), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Improvement (%)',
+          data: impr,
+          backgroundColor: '#FFD580',
+          borderRadius: 3
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { maxRotation: 45, font: { size: 10 } } },
+          y: { max: 105,
+               title: { display: true, text: 'Improvement (%)' },
+               grid: { color: '#F0F0F0' } }
+        }
+      }
+    });
+
+    // Results table
+    const tbody = document.getElementById('results-table');
+    const files = data.map(d => d.app + '_result.json');
+    document.getElementById('caption').textContent =
+      'Results loaded from: ' + files.join(', ');
+
+    data.forEach(d => {
+      const library = d.app === 'realApp' ? 'arrow' :
+                      d.app.replace('app_', '');
+      const badge = d.improvement_pct > 0
+        ? `<span class="badge badge-green">${d.improvement_pct.toFixed(1)}% faster</span>`
+        : `<span class="badge badge-gray">N/A</span>`;
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><strong>${d.app}</strong></td>
+        <td>${library}</td>
+        <td>${d.optional_functions}</td>
+        <td>${d.indispensable}</td>
+        <td>${d.hybrid_groups}</td>
+        <td>${d.original_ms.toFixed(4)}</td>
+        <td>${d.hybrid_ms.toFixed(4)}</td>
+        <td>${badge}</td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    // Load Lambda cold start results
+    const csResponse = await fetch(COLDSTART_URL);
+    const csData = await csResponse.json();
+    const csApps = Object.keys(csData);
+
+    const csLabels = csApps.map(a =>
+      a === 'realApp' ? 'arrow' : a.replace('app_', ''));
+    const csOrig = csApps.map(a => csData[a].original_ms);
+    const csImpr = csApps.map(a => csData[a].improved_ms);
+    const csPct = csApps.map(a => csData[a].improvement_pct);
+
+    // Chart 3 - Cold start time
+    new Chart(document.getElementById('chart3'), {
+      type: 'bar',
+      data: {
+        labels: csLabels,
+        datasets: [
+          { label: 'Original FaaSLight', data: csOrig,
+            backgroundColor: '#5DADE2', borderRadius: 3 },
+          { label: 'Hybrid Improvement', data: csImpr,
+            backgroundColor: '#1F4E79', borderRadius: 3 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } },
+        scales: {
+          x: { ticks: { maxRotation: 45, font: { size: 10 } } },
+          y: { title: { display: true, text: 'Cold Start (ms)' },
+               grid: { color: '#F0F0F0' } }
+        }
+      }
+    });
+
+    // Chart 4 - Cold start improvement %
+    new Chart(document.getElementById('chart4'), {
+      type: 'bar',
+      data: {
+        labels: csLabels,
+        datasets: [{
+          label: 'Improvement (%)',
+          data: csPct,
+          backgroundColor: csPct.map(v =>
+            v > 0 ? '#2E7D32' : '#C62828'),
+          borderRadius: 3
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { maxRotation: 45, font: { size: 10 } } },
+          y: { title: { display: true, text: 'Improvement (%)' },
+               grid: { color: '#F0F0F0' } }
+        }
+      }
+    });
+
+    // Cold start table
+    const csTbody = document.getElementById('coldstart-table');
+    csApps.forEach(app => {
+      const r = csData[app];
+      const badge = r.improvement_pct > 0
+        ? `<span class="badge badge-green">${r.improvement_pct.toFixed(1)}% faster</span>`
+        : `<span class="badge badge-red">${r.improvement_pct.toFixed(1)}%</span>`;
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><strong>${app}</strong></td>
+        <td>${r.original_ms.toFixed(2)}</td>
+        <td>${r.improved_ms.toFixed(2)}</td>
+        <td>${r.improvement_ms.toFixed(2)}</td>
+        <td>${badge}</td>
+      `;
+      csTbody.appendChild(row);
+    });
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+
+  } catch(e) {
+    document.getElementById('loading').textContent =
+      'Error loading results: ' + e.message;
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>

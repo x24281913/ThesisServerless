@@ -1,18 +1,3 @@
-"""
-run_pipeline.py
-Student: Amruta Anil Dicholkar | X24281913
-MSc Cloud Computing - NCI
-Foundation Paper: FaaSLight (Liu et al., 2023)
-
-Generic pipeline script - works on any application.
-
-Usage:
-  python3 run_pipeline.py realApp
-  python3 run_pipeline.py app_lxml
-  python3 run_pipeline.py app_pdf
-  python3 run_pipeline.py app_pandas
-"""
-
 import os
 import sys
 import json
@@ -200,8 +185,6 @@ if os.path.exists(imp_folder):
     shutil.rmtree(imp_folder)
 shutil.copytree(app_folder, imp_folder)
 
-# gzipinfo.txt is NEVER created in hybrid improvement
-# hybrid_assoc_*.json and hybrid_freq_*.json are created
 imp_gzip = '{}/gzipinfo.txt'.format(imp_folder)
 os.system(
     'python3 Auto_delete_v6.py '
@@ -240,7 +223,6 @@ if hybrid_files:
 # ── STEP 9 — Verify ────────────────────────────────────
 print("\nStep 9 - Verifying results...")
 
-# Count all functions in hybrid groups
 improved_data = {}
 for hf in hybrid_files:
     with open(
@@ -293,3 +275,16 @@ result_file = '{}_result.json'.format(app_folder)
 with open(result_file, 'w') as f:
     json.dump(result, f, indent=2)
 print("Result saved to {}".format(result_file))
+
+# ── AUTO UPLOAD RESULT TO S3 ───────────────────────────
+try:
+    import boto3
+    s3 = boto3.client('s3', region_name='us-east-1')
+    s3.upload_file(
+        result_file,
+        'thesis-faaslight-results',
+        result_file
+    )
+    print("Result uploaded to S3: {}".format(result_file))
+except Exception as e:
+    print("S3 upload skipped: {}".format(e))

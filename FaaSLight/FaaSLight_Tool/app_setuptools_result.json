@@ -6,5 +6,15 @@
   "original_ms": 0.0673,
   "hybrid_ms": 0.0401,
   "improvement_ms": 0.0272,
-  "improvement_pct": 40.4
+  "improvement_pct": 40.4,
+  "loading_test": {
+    "functions_tested": 5,
+    "total_groups_available": 1,
+    "groups_loaded": 1,
+    "groups_not_loaded": 0,
+    "groups_loaded_names": [
+      "hybrid_freq_0"
+    ],
+    "proof": "Only 1 of 1 groups loaded for 5 function calls"
+  }
 }

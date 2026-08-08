@@ -1,9 +1,9 @@
 {
   "realApp": {
-    "original_ms": 225.5,
-    "improved_ms": 212.01,
-    "improvement_ms": 13.49,
-    "improvement_pct": 6.0
+    "original_ms": 214.16,
+    "improved_ms": 208.03,
+    "improvement_ms": 6.13,
+    "improvement_pct": 2.9
   },
   "app_requests": {
     "original_ms": 215.46,

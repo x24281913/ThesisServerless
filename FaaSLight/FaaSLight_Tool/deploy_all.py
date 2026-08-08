@@ -1,21 +1,3 @@
-"""
-deploy_all.py
-Student: Amruta Anil Dicholkar | X24281913
-MSc Cloud Computing - NCI
-
-Deploys all applications to AWS Lambda
-and measures cold start latency.
-
-Deploys TWO versions of each app:
-1. Original FaaSLight version
-2. Your hybrid improvement version
-
-Then measures and compares cold start times.
-
-Usage:
-  python3 deploy_all.py
-"""
-
 import os
 import sys
 import json
@@ -26,45 +8,34 @@ import zipfile
 REGION = 'us-east-1'
 ROLE_ARN = 'arn:aws:iam::056106910789:role/LabRole'
 LAYER_ARN = 'arn:aws:lambda:us-east-1:056106910789:layer:thesis-custom-funtemplate:1'
+DEFAULT_HANDLER = 'main.lambda_handler'
 
-APPS = [
-    {
-        'name': 'realApp',
-        'handler': 'main.lambda_handler'
-    },
-    {
-        'name': 'app_requests',
-        'handler': 'main.lambda_handler'
-    },
-    {
-        'name': 'app_dateutil',
-        'handler': 'main.lambda_handler'
-    },
-    {
-        'name': 'app_faas5',
-        'handler': 'main.lambda_handler'
-    },
-    {
-        'name': 'app_urllib3',
-        'handler': 'main.lambda_handler'
-    },
-    {
-        'name': 'app_parso',
-        'handler': 'main.lambda_handler'
-    },
-    {
-        'name': 'app_docutils',
-        'handler': 'main.lambda_handler'
-    },
-    {
-        'name': 'app_packaging',
-        'handler': 'main.lambda_handler'
-    },
-    {
-        'name': 'app_jedi',
-        'handler': 'main.lambda_handler'
-    },
-]
+# ── Optional: filter to a single app via command line ──
+# Usage:
+#   python3 deploy_all.py            -> runs every discovered app
+#   python3 deploy_all.py realApp    -> runs only realApp
+target_app = sys.argv[1] if len(sys.argv) > 1 else None
+
+
+def discover_apps():
+    """
+    Auto-discover apps by scanning the current directory for
+    '<name>_original' / '<name>_improved' folder pairs, instead of
+    relying on a hardcoded list. Any app run through run_pipeline.py
+    automatically becomes deployable here with zero script edits.
+    """
+    apps = []
+    for entry in sorted(os.listdir('.')):
+        if not entry.endswith('_original') or not os.path.isdir(entry):
+            continue
+        app_name = entry[:-len('_original')]
+        imp_folder = '{}_improved'.format(app_name)
+        if os.path.isdir(imp_folder):
+            apps.append({
+                'name': app_name,
+                'handler': DEFAULT_HANDLER
+            })
+    return apps
 
 
 def zip_folder(folder_path, zip_path):
@@ -97,14 +68,11 @@ def deploy_lambda(function_name, zip_path,
 
     try:
         client.get_function(FunctionName=function_name)
-        # Update if exists
         client.update_function_code(
             FunctionName=function_name,
             ZipFile=zip_bytes
         )
-        # Wait for update to complete
         time.sleep(3)
-        # Update layer configuration
         client.update_function_configuration(
             FunctionName=function_name,
             Layers=[LAYER_ARN]
@@ -163,16 +131,34 @@ def measure_cold_start(function_name, invocations=5):
 
 if __name__ == "__main__":
     print("="*60)
-    print("Lambda Deployment - FaaSLight Gap 2 Thesis")
-    print("Student: Amruta Anil Dicholkar X24281913")
+    print("Lambda Deployment")
     print("Region: {}".format(REGION))
     print("Role: {}".format(ROLE_ARN))
     print("Layer: {}".format(LAYER_ARN))
     print("="*60)
 
+    discovered_apps = discover_apps()
+
+    if not discovered_apps:
+        print("ERROR: No '<name>_original' / '<name>_improved' folder "
+              "pairs found in the current directory. Run "
+              "run_pipeline.py first.")
+        sys.exit(1)
+
+    apps_to_run = [a for a in discovered_apps if a['name'] == target_app] \
+        if target_app else discovered_apps
+
+    if target_app and not apps_to_run:
+        print("ERROR: '{}' not found. Discovered apps: {}".format(
+            target_app, [a['name'] for a in discovered_apps]))
+        sys.exit(1)
+
+    print("Apps to deploy: {}".format(
+        [a['name'] for a in apps_to_run]))
+
     all_results = {}
 
-    for app in APPS:
+    for app in apps_to_run:
         app_name = app['name']
         handler = app['handler']
 
@@ -249,12 +235,32 @@ if __name__ == "__main__":
             traceback.print_exc()
             continue
 
-    # Save results
+    # Save results — merge with existing so other apps aren't wiped out
+    existing_results = {}
+    if os.path.exists('lambda_coldstart_results.json'):
+        with open('lambda_coldstart_results.json', 'r') as f:
+            existing_results = json.load(f)
+
+    existing_results.update(all_results)
+
     with open('lambda_coldstart_results.json', 'w') as f:
-        json.dump(all_results, f, indent=2)
+        json.dump(existing_results, f, indent=2)
+
+    # ── AUTO UPLOAD TO S3 ───────────────────────────────
+    try:
+        s3 = boto3.client('s3', region_name=REGION)
+        s3.upload_file(
+            'lambda_coldstart_results.json',
+            'thesis-faaslight-results',
+            'lambda_coldstart_results.json'
+        )
+        print("Cold start results uploaded to S3: "
+              "lambda_coldstart_results.json")
+    except Exception as e:
+        print("S3 upload skipped: {}".format(e))
 
     print("\n" + "="*60)
-    print("FINAL RESULTS")
+    print("FINAL RESULTS (this run)")
     print("="*60)
     for app_name, r in all_results.items():
         print("{:<20} orig: {:>8} ms  "
@@ -265,4 +271,6 @@ if __name__ == "__main__":
             r['improved_ms'],
             r['improvement_pct']))
     print()
-    print("Results saved to lambda_coldstart_results.json")
+    print("Results saved to lambda_coldstart_results.json "
+          "({} total apps tracked)".format(len(existing_results)))
+          

@@ -3,8 +3,19 @@
   "optional_functions": 44,
   "indispensable": 123,
   "hybrid_groups": 5,
-  "original_ms": 0.4866,
-  "hybrid_ms": 0.0485,
-  "improvement_ms": 0.4381,
-  "improvement_pct": 90.0
+  "original_ms": 0.425,
+  "hybrid_ms": 0.0494,
+  "improvement_ms": 0.3756,
+  "improvement_pct": 88.4,
+  "loading_test": {
+    "functions_tested": 5,
+    "total_groups_available": 5,
+    "groups_loaded": 2,
+    "groups_not_loaded": 3,
+    "groups_loaded_names": [
+      "hybrid_assoc_0",
+      "hybrid_freq_0"
+    ],
+    "proof": "Only 2 of 5 groups loaded for 5 function calls"
+  }
 }

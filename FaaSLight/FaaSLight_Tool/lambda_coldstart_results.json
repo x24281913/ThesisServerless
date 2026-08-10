@@ -1,27 +1,27 @@
 {
   "realApp": {
-    "original_ms": 214.16,
-    "improved_ms": 208.03,
-    "improvement_ms": 6.13,
-    "improvement_pct": 2.9
+    "original_ms": 189.74,
+    "improved_ms": 179.25,
+    "improvement_ms": 10.49,
+    "improvement_pct": 5.5
   },
   "app_requests": {
-    "original_ms": 215.46,
-    "improved_ms": 229.43,
-    "improvement_ms": -13.97,
-    "improvement_pct": -6.5
+    "original_ms": 174.45,
+    "improved_ms": 184.98,
+    "improvement_ms": -10.53,
+    "improvement_pct": -6.0
   },
   "app_dateutil": {
-    "original_ms": 204.01,
-    "improved_ms": 185.13,
-    "improvement_ms": 18.88,
-    "improvement_pct": 9.3
+    "original_ms": 171.07,
+    "improved_ms": 157.08,
+    "improvement_ms": 13.99,
+    "improvement_pct": 8.2
   },
   "app_faas5": {
-    "original_ms": 245.52,
-    "improved_ms": 263.99,
-    "improvement_ms": -18.47,
-    "improvement_pct": -7.5
+    "original_ms": 198.64,
+    "improved_ms": 202.89,
+    "improvement_ms": -4.25,
+    "improvement_pct": -2.1
   },
   "app_urllib3": {
     "original_ms": 205.17,
@@ -52,5 +52,17 @@
     "improved_ms": 258.51,
     "improvement_ms": 2.46,
     "improvement_pct": 0.9
+  },
+  "app_setuptools": {
+    "original_ms": 207.84,
+    "improved_ms": 196.49,
+    "improvement_ms": 11.35,
+    "improvement_pct": 5.5
+  },
+  "app_demo": {
+    "original_ms": 234.04,
+    "improved_ms": 228.23,
+    "improvement_ms": 5.81,
+    "improvement_pct": 2.5
   }
 }

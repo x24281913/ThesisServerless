@@ -1,0 +1,42 @@
+"""
+    pygments.lexers.roboconf
+    ~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Lexers for Roboconf DSL.
+
+    :copyright: Copyright 2006-present by the Pygments team, see AUTHORS.
+    :license: BSD, see LICENSE for details.
+"""
+
+from pygments.lexer import RegexLexer, words, re
+from pygments.token import Text, Operator, Keyword, Name, Comment
+__all__ = ['RoboconfGraphLexer', 'RoboconfInstancesLexer']
+
+
+class RoboconfGraphLexer(RegexLexer):
+    """
+    Lexer for Roboconf graph files.
+    """
+    name = 'Roboconf Graph'
+    aliases = ['roboconf-graph']
+    filenames = ['*.graph']
+    url = 'https://roboconf.github.io/en/user-guide/graph-definition.html'
+    version_added = '2.1'
+    flags = re.IGNORECASE | re.MULTILINE
+    tokens = {'root': [('\\s+', Text), ('=', Operator), (words(('facet', 'import'), suffix='\\s*\\b', prefix='\\b'), Keyword), (words(('installer', 'extends', 'exports', 'imports', 'facets', 'children'), suffix='\\s*:?', prefix='\\b'), Name), ('#.*\\n', Comment), ('[^#]', Text), ('.*\\n', Text)]}
+
+
+
+class RoboconfInstancesLexer(RegexLexer):
+    """
+    Lexer for Roboconf instances files.
+    """
+    name = 'Roboconf Instances'
+    aliases = ['roboconf-instances']
+    filenames = ['*.instances']
+    url = 'https://roboconf.github.io'
+    version_added = '2.1'
+    flags = re.IGNORECASE | re.MULTILINE
+    tokens = {'root': [('\\s+', Text), (words(('instance of', 'import'), suffix='\\s*\\b', prefix='\\b'), Keyword), (words(('name', 'count'), suffix='s*:?', prefix='\\b'), Name), ('\\s*[\\w.-]+\\s*:', Name), ('#.*\\n', Comment), ('[^#]', Text), ('.*\\n', Text)]}
+
+

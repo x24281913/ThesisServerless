@@ -8,12 +8,7 @@ import shutil
 sys.setrecursionlimit(5000000)
 
 def run_loading_test(imp_folder, num_functions=5):
-    """
-    Generalized on-demand loading verification.
-    Works for ANY application — proves that, per function call, only
-    the group actually needed is loaded from disk, not every group at
-    once (unlike original FaaSLight's single gzipinfo.txt).
-    """
+
     index_path = os.path.join(imp_folder, 'hybrid_group_index.json')
 
     if not os.path.exists(index_path):
@@ -355,3 +350,4 @@ try:
     print("Result uploaded to S3: {}".format(result_file))
 except Exception as e:
     print("S3 upload skipped: {}".format(e))
+    

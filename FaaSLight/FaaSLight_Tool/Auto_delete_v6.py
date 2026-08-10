@@ -672,7 +672,6 @@ if __name__ == "__main__":
     # fout.close()
     
     # ── GIMPROVEMENT ──
-    # Group by frequency FIRST then save as plain JSON
 
     call_graph_file = os.path.join(sta_file, 'output.json')
     if os.path.exists(call_graph_file):
@@ -681,7 +680,7 @@ if __name__ == "__main__":
     else:
         call_graph = {}
 
-    # transactions
+    # checking transactions
     transactions = []
     for caller, callees in call_graph.items():
         if caller in pickle_dict:
@@ -737,11 +736,7 @@ if __name__ == "__main__":
         len(associated)))
     print("Isolated functions: {}".format(len(isolated)))
 
-    # PART 1 - Association Groups (threshold 10-15)
-    # Pure association groups only
-    # No isolated functions added to fill gaps
-    # If only 5 associated functions exist
-    # group of 5 is created as is
+    # Phase 1 - Association Groups (threshold 15)
     max_size = 15
     groups = {}
     group_index = {}
@@ -763,7 +758,7 @@ if __name__ == "__main__":
         current_assoc_group.append(func)
         visited.add(func)
 
-        # Add direct rule partners to same group
+        # Add direct rule functions to same group
         for partner in rule_partners.get(func, set()):
             if partner not in visited and \
                     len(current_assoc_group) < max_size:
@@ -788,8 +783,6 @@ if __name__ == "__main__":
             current_assoc_group = []
 
     # Save remaining associated functions as last group
-    # Even if less than max_size
-    # Do NOT fill with isolated functions
     if current_assoc_group:
         gid = "hybrid_assoc_{}".format(group_id)
         groups[gid] = {
@@ -805,14 +798,12 @@ if __name__ == "__main__":
             gid, len(groups[gid])))
         group_id += 1
 
-    # Rebuild isolated AFTER association grouping
-    # Excludes ALL functions already in association groups
     isolated = set(pickle_dict.keys()) - visited
 
     print("Remaining isolated functions: {}".format(
         len(isolated)))
 
-    # PART 2 - Frequency Groups (threshold 10)
+    # Phase 2 - Frequency Groups (threshold 10)
     freq_group_size = 10
     frequency = {}
     for func in isolated:
@@ -884,3 +875,4 @@ if __name__ == "__main__":
     print("Combined index:     hybrid_group_index.json")
     print("Total groups: {}".format(len(groups)))
     print("Total functions grouped: {}".format(len(group_index)))
+    

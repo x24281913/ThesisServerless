@@ -1,0 +1,3 @@
+pygments.style.StyleMeta.__iter__
+pygments.style.StyleMeta.__len__
+pygments.lexers.sql.lookahead.__iter__

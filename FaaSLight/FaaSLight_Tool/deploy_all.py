@@ -10,20 +10,10 @@ ROLE_ARN = 'arn:aws:iam::056106910789:role/LabRole'
 LAYER_ARN = 'arn:aws:lambda:us-east-1:056106910789:layer:thesis-custom-funtemplate:1'
 DEFAULT_HANDLER = 'main.lambda_handler'
 
-# ── Optional: filter to a single app via command line ──
-# Usage:
-#   python3 deploy_all.py            -> runs every discovered app
-#   python3 deploy_all.py realApp    -> runs only realApp
 target_app = sys.argv[1] if len(sys.argv) > 1 else None
 
 
 def discover_apps():
-    """
-    Auto-discover apps by scanning the current directory for
-    '<name>_original' / '<name>_improved' folder pairs, instead of
-    relying on a hardcoded list. Any app run through run_pipeline.py
-    automatically becomes deployable here with zero script edits.
-    """
     apps = []
     for entry in sorted(os.listdir('.')):
         if not entry.endswith('_original') or not os.path.isdir(entry):
@@ -39,7 +29,6 @@ def discover_apps():
 
 
 def zip_folder(folder_path, zip_path):
-    """Zip entire folder for Lambda deployment"""
     print("  Zipping {}...".format(folder_path))
     with zipfile.ZipFile(zip_path, 'w',
                          zipfile.ZIP_DEFLATED) as zf:
@@ -60,7 +49,6 @@ def zip_folder(folder_path, zip_path):
 
 def deploy_lambda(function_name, zip_path,
                   handler, role_arn):
-    """Deploy zip to AWS Lambda"""
     client = boto3.client('lambda', region_name=REGION)
 
     with open(zip_path, 'rb') as f:
@@ -102,8 +90,7 @@ def deploy_lambda(function_name, zip_path,
     print("  Ready!")
 
 
-def measure_cold_start(function_name, invocations=5):
-    """Invoke Lambda and measure response times"""
+def measure_cold_start(function_name, invocations=10):
     client = boto3.client('lambda', region_name=REGION)
     times = []
 
@@ -235,7 +222,6 @@ if __name__ == "__main__":
             traceback.print_exc()
             continue
 
-    # Save results — merge with existing so other apps aren't wiped out
     existing_results = {}
     if os.path.exists('lambda_coldstart_results.json'):
         with open('lambda_coldstart_results.json', 'r') as f:

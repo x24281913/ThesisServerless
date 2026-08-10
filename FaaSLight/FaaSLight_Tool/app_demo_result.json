@@ -1,0 +1,20 @@
+{
+  "app": "app_demo",
+  "optional_functions": 102,
+  "indispensable": 161,
+  "hybrid_groups": 11,
+  "original_ms": 0.7576,
+  "hybrid_ms": 0.0611,
+  "improvement_ms": 0.6965,
+  "improvement_pct": 91.9,
+  "loading_test": {
+    "functions_tested": 5,
+    "total_groups_available": 11,
+    "groups_loaded": 1,
+    "groups_not_loaded": 10,
+    "groups_loaded_names": [
+      "hybrid_assoc_0"
+    ],
+    "proof": "Only 1 of 11 groups loaded for 5 function calls"
+  }
+}
